@@ -60,8 +60,15 @@ if __name__ == '__main__':
     parser.add_argument('model', type=str,
     help='Path to model definition json. Model weights should be on the same path.')
     args = parser.parse_args()
+    # load json and create model
+    json_file = open('model.json', 'r')
+    loaded_model_json = json_file.read()
+    json_file.close()
+    model = model_from_json(loaded_model_json)
+    '''
     with open(args.model, 'r') as jfile:
         model = model_from_json(json.load(jfile))
+    '''
 
     model.compile("adam", "mse")
     weights_file = args.model.replace('json', 'h5')

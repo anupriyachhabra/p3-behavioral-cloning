@@ -59,3 +59,11 @@ history = model.fit(X_train, Y_train,
                     batch_size=50, nb_epoch = 10,
                     verbose=1, validation_data=(X_val, Y_val))
 print ("Validation Accuracy ", history.history['val_acc'][0])
+
+# serialize model to JSON
+model_json = model.to_json()
+with open("model.json", "w") as json_file:
+    json_file.write(model_json)
+# serialize weights to HDF5
+model.save_weights("model.h5")
+print("Saved model to disk")
