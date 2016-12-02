@@ -2,4 +2,4 @@
 .idea
 *.csv
 IMG
-training-data
+training*
