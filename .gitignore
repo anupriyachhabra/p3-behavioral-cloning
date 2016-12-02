@@ -1,0 +1,5 @@
+*.app
+.idea
+*.csv
+IMG
+training-data
