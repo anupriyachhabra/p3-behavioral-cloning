@@ -3,3 +3,5 @@
 *.csv
 IMG
 training*
+.DS_store
+__pycache__
