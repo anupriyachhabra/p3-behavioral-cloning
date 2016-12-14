@@ -35,7 +35,7 @@ def train_model():
     y_train = training_data[3]
 
     X_train = preprocess(X_train)
-    nb_filters = 32
+    nb_filters = 256
 
     # convolution kernel size
     kernel_size = (3, 3)
@@ -62,10 +62,10 @@ def train_model():
 
 
     X_train, X_val, Y_train, Y_val = train_test_split(
-            X_train, y_train,test_size=0.25, random_state=832289)
+            X_train, y_train,test_size=0.05, random_state=832289)
 
     history = model.fit(X_train, Y_train,
-                        batch_size=50, nb_epoch = 10,
+                        batch_size=50, nb_epoch = 3,
                         verbose=1, validation_data=(X_val, Y_val))
     print ("Validation Accuracy ", history.history['val_acc'][0])
 
