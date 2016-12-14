@@ -25,6 +25,9 @@ def train_model():
 
     training_data = pd.read_csv("driving_log.csv", header=None)
     X_train = []
+    y_train = []
+    X_augmented =[]
+    y_augmented = []
     images = training_data[0]
 
     for i in range(0, len(images)):
@@ -32,7 +35,17 @@ def train_model():
          #Crop top half image
         img = img[img.shape[0]//2:]
         X_train.append(img)
-    y_train = training_data[3]
+        y_train.append(training_data[3][i])
+        if np.random.choice([True, False]):
+            flp_img, rev_angle = np.fliplr(img), -training_data[3][i]
+            X_train.append(flp_img)
+            y_train.append(rev_angle)
+    #y_train = training_data[3]
+
+    # Append augmented data
+    #X_train += X_augmented
+    #y_train += y_augmented
+
 
     X_train = preprocess(X_train)
     nb_filters = 256
