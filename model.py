@@ -35,9 +35,9 @@ def train_model():
          #Crop top half image
         img = img[img.shape[0]//2:]
         X_train.append(img)
-        y_train.append(training_data[3][i])
+        y_train.append(training_data[3][i].item())
         if np.random.choice([True, False]):
-            flp_img, rev_angle = np.fliplr(img), -training_data[3][i]
+            flp_img, rev_angle = np.fliplr(img), -training_data[3][i].item()
             X_train.append(flp_img)
             y_train.append(rev_angle)
     #y_train = training_data[3]
