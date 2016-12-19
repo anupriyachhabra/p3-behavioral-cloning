@@ -34,7 +34,7 @@ def telemetry(sid, data):
     imgString = data["image"]
     image = Image.open(BytesIO(base64.b64decode(imgString)))
     image_array = np.asarray(image)
-    image_array = image_array[image_array.shape[0] // 2:]
+    image_array = image_array[image_array.shape[0] // 3:]
     image_array = preprocess(image_array)
     transformed_image_array = image_array[None, :, :, :]
 
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     '''
 
     model.compile("adam", "mse")
-    weights_file = args.model.replace('json', 'h5')
+    weights_file =  args.model.replace('json', 'h5')
     model.load_weights(weights_file)
 
     # wrap Flask application with engineio's middleware
