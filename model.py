@@ -3,7 +3,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
 import numpy as np
-import cv2
+import csv
 from keras.optimizers import Adam
 from scipy import misc
 from sklearn.model_selection import train_test_split
@@ -23,19 +23,35 @@ def preprocess(images):
 
 def train_model():
 
-    training_data = pd.read_csv("driving_log.csv", header=None)
     X_train = []
-    images = training_data[0]
+    y_train = []
+    with open('driving_log.csv', 'r') as csvfile:
+        csv_reader = csv.reader(csvfile)
+        for row in csv_reader:
+            img = misc.imread(row[0])
+            #Crop top half image
+            height = img.shape[0]
+            img = img[height//2 - 25: height-25]
+            X_train.append(img)
+            steering_angle = float(row[3])
+            y_train.append(steering_angle)
 
-    for i in range(0, len(images)):
-        img = misc.imread(images[i])
-         #Crop top half image
-        img = img[img.shape[0]//2:]
-        X_train.append(img)
-    y_train = training_data[3]
+            #left image
+            left_img = misc.imread(row[1].strip())
+            left_img = left_img[height//2 - 25: height-25]
+            X_train.append(left_img)
+            y_train.append(steering_angle + 0.25)
+
+            #right image
+            right_img = misc.imread(row[2].strip())
+            right_img = right_img[height//2 - 25: height-25]
+            X_train.append(right_img)
+            y_train.append(steering_angle - 0.25)
 
     X_train = preprocess(X_train)
-    nb_filters = 256
+
+
+    nb_filters = 32
 
     # convolution kernel size
     kernel_size = (3, 3)
@@ -54,7 +70,12 @@ def train_model():
     model.add(MaxPooling2D(pool_size=pool_size))
     model.add(Dropout(0.75))
 
+    #model.add(Convolution2D(nb_filters, kernel_size[0], kernel_size[1],
+                           # border_mode='valid'))
+    #model.add(Dropout(0.75))
+
     model.add(Flatten())
+    #model.add(Dense(1024))
     model.add(Dense(256))
     model.add(Dense(1))
 
