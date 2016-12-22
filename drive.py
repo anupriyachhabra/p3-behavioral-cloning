@@ -1,20 +1,16 @@
 import argparse
 import base64
-import json
 
 import numpy as np
 import socketio
-import eventlet
 import eventlet.wsgi
-import time
 from PIL import Image
-from PIL import ImageOps
 from flask import Flask, render_template
 from io import BytesIO
 from model import preprocess
 
 from keras.models import model_from_json
-from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array
+from keras.utils.visualize_util import plot
 
 
 sio = socketio.Server()
@@ -43,11 +39,14 @@ def telemetry(sid, data):
     steering_angle = float(model.predict(transformed_image_array, batch_size=1))
     # The driving model currently just outputs a constant throttle. Feel free to edit this.
     throttle = 0.2
+
+    # Slowing down while turning
     if abs(steering_angle) > 0.3 :
         throttle = 0.0
-    if steering_angle > 0 :
-       steering_angle += 0.15
 
+    #Added extra bias/weightage to right as data contains too many left turns (biased to left)
+    #if steering_angle > 0 :
+        #steering_angle += 0.15
 
     print(steering_angle, throttle)
     send_control(steering_angle, throttle)
@@ -76,14 +75,11 @@ if __name__ == '__main__':
     loaded_model_json = json_file.read()
     json_file.close()
     model = model_from_json(loaded_model_json)
-    '''
-    with open(args.model, 'r') as jfile:
-        model = model_from_json(json.load(jfile))
-    '''
-
     model.compile("adam", "mse")
     weights_file = args.model.replace('json', 'h5')
     model.load_weights(weights_file)
+    
+    plot(model, to_file='model.png', show_shapes= True)
 
     # wrap Flask application with engineio's middleware
     app = socketio.Middleware(sio, app)
