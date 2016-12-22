@@ -14,8 +14,6 @@ from io import BytesIO
 from model import preprocess
 
 from keras.models import model_from_json
-from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array
-
 
 sio = socketio.Server()
 app = Flask(__name__)
@@ -45,8 +43,8 @@ def telemetry(sid, data):
     throttle = 0.2
     if abs(steering_angle) > 0.3 :
         throttle = 0.0
-    if steering_angle > 0 :
-       steering_angle += 0.15
+   # if float(speed) < 5.0 :
+       # throttle = 0.4
 
 
     print(steering_angle, throttle)
@@ -82,7 +80,7 @@ if __name__ == '__main__':
     '''
 
     model.compile("adam", "mse")
-    weights_file = args.model.replace('json', 'h5')
+    weights_file = 'weights.05-0.01.h5'#args.model.replace('json', 'h5')
     model.load_weights(weights_file)
 
     # wrap Flask application with engineio's middleware

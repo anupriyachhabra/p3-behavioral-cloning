@@ -7,8 +7,7 @@ import csv
 from keras.optimizers import Adam
 from scipy import misc
 from sklearn.model_selection import train_test_split
-
-import pandas as pd
+from keras.callbacks import ModelCheckpoint
 
 def preprocess(images):
 
@@ -21,6 +20,26 @@ def preprocess(images):
 
     return images
 
+
+def batch_generator(X_train, Y_train, input_shape = (80, 320, 3), batch_size = 50):
+    train_images = []
+    train_steering = []
+
+    while True:
+        for i in range(0, len(X_train)):
+            img = misc.imread(X_train[i])
+            # Crop top half image
+            height = img.shape[0]
+            img = img[height // 2 - 25: height - 25]
+            train_images.append(img)
+            train_steering.append(Y_train[i])
+            if (i !=0 and i % batch_size == 0) or i == (len(X_train)-1) :
+                train_images = preprocess(np.array(train_images))
+                yield train_images, np.array(train_steering)
+                train_images = []
+                train_steering = []
+
+
 def train_model():
 
     X_train = []
@@ -28,27 +47,27 @@ def train_model():
     with open('driving_log.csv', 'r') as csvfile:
         csv_reader = csv.reader(csvfile)
         for row in csv_reader:
-            img = misc.imread(row[0])
-            #Crop top half image
-            height = img.shape[0]
-            img = img[height//2 - 25: height-25]
-            X_train.append(img)
+            X_train.append(row[0])
             steering_angle = float(row[3])
             y_train.append(steering_angle)
 
+            # Calculating angle seen from left and right cameras
+            left_angle = steering_angle
+            right_angle = steering_angle
+            if steering_angle < 0:
+                left_angle = steering_angle * 0.5
+                right_angle = steering_angle * 1.5
+            if steering_angle > 0:
+                left_angle = steering_angle * 1.5
+                right_angle = steering_angle * 0.5
+
             #left image
-            left_img = misc.imread(row[1].strip())
-            left_img = left_img[height//2 - 25: height-25]
-            X_train.append(left_img)
-            y_train.append(steering_angle + 0.25)
+            X_train.append(row[1].strip())
+            y_train.append(left_angle)
 
             #right image
-            right_img = misc.imread(row[2].strip())
-            right_img = right_img[height//2 - 25: height-25]
-            X_train.append(right_img)
-            y_train.append(steering_angle - 0.25)
-
-    X_train = preprocess(X_train)
+            X_train.append(row[2].strip())
+            y_train.append(right_angle)
 
 
     nb_filters = 32
@@ -56,12 +75,10 @@ def train_model():
     # convolution kernel size
     kernel_size = (3, 3)
     pool_size =(4, 4)
-    input_shape = X_train.shape[1:]
-    print(input_shape)
     model = Sequential()
     model.add(Convolution2D(nb_filters, kernel_size[0], kernel_size[1],
                             border_mode='valid',
-                            input_shape=input_shape))
+                            input_shape=(80, 320, 3)))
     model.add(MaxPooling2D(pool_size=pool_size))
     model.add(Dropout(0.5))
 
@@ -70,25 +87,23 @@ def train_model():
     model.add(MaxPooling2D(pool_size=pool_size))
     model.add(Dropout(0.75))
 
-    #model.add(Convolution2D(nb_filters, kernel_size[0], kernel_size[1],
-                           # border_mode='valid'))
-    #model.add(Dropout(0.75))
-
     model.add(Flatten())
-    #model.add(Dense(1024))
     model.add(Dense(256))
     model.add(Dense(1))
 
-    model.compile(loss='mean_squared_error', optimizer=Adam(), metrics=['accuracy'])
+    model.compile(loss='mean_squared_error', optimizer=Adam())
 
 
     X_train, X_val, Y_train, Y_val = train_test_split(
             X_train, y_train,test_size=0.05, random_state=832289)
 
-    history = model.fit(X_train, Y_train,
-                        batch_size=50, nb_epoch = 3,
-                        verbose=1, validation_data=(X_val, Y_val))
-    print ("Validation Accuracy ", history.history['val_acc'][0])
+    checkpoint_path = "weights.{epoch:02d}-{val_loss:.2f}.h5"
+    checkpoint = ModelCheckpoint(checkpoint_path, verbose=1, save_best_only=False, save_weights_only=False, mode='auto')
+
+    model.fit_generator(batch_generator(X_train, Y_train),
+                        samples_per_epoch= len(X_train), nb_epoch = 3,
+                        verbose=1, validation_data=batch_generator(X_val, Y_val),
+                        nb_val_samples=len(X_val), callbacks=[checkpoint], max_q_size=1, pickle_safe=False)
 
     # serialize model to JSON
     model_json = model.to_json()
