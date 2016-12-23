@@ -30,18 +30,22 @@ def telemetry(sid, data):
     image = Image.open(BytesIO(base64.b64decode(imgString)))
     image_array = np.asarray(image)
     height = image_array.shape[0]
-    image_array = image_array[height//2 - 25: height-25]
+    width = image_array.shape[1]
+    image_array = image_array[height//2 - 25: height-25, 50: width-50]
     image_array = preprocess(image_array)
     transformed_image_array = image_array[None, :, :, :]
 
     # This model currently assumes that the features of the model are just the images. Feel free to change this.
     steering_angle = float(model.predict(transformed_image_array, batch_size=1))
     # The driving model currently just outputs a constant throttle. Feel free to edit this.
+    # Slowing down while turning
+
     throttle = 0.2
 
-    # Slowing down while turning
-    #if abs(steering_angle) > 0.3 :
+    #if abs(steering_angle) > 0.2 :
        # throttle = 0.0
+
+
 
     print(steering_angle, throttle)
     send_control(steering_angle, throttle)

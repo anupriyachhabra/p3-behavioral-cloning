@@ -8,6 +8,7 @@ from keras.optimizers import Adam
 from scipy import misc
 from sklearn.model_selection import train_test_split
 from keras.callbacks import ModelCheckpoint
+#from imblearn.over_sampling import SMOTE
 
 def preprocess(images):
 
@@ -37,7 +38,7 @@ def batch_generator(X_train, Y_train, input_shape = (80, 320, 3), batch_size = 5
             height = img.shape[0]
             width = img.shape[1]
             #width -50 + 50
-            img = img[height // 2 - 25: height - 25]
+            img = img[height // 2 - 25: height - 25, 50: width-50]
             train_images.append(img)
             train_steering.append(Y_train[i])
             if (i !=0 and i % batch_size == 0) or i == (len(X_train)-1) :
@@ -57,15 +58,6 @@ def train_model():
             X_train.append(row[0])
             steering_angle = float(row[3])
             y_train.append(steering_angle)
-
-            #Oversample on right
-
-            if abs(steering_angle) > 0.01:
-                    X_train.append(row[0])
-                    y_train.append(steering_angle)
-                    X_train.append('flip'+row[0])
-                    y_train.append(-steering_angle)
-
 
             # Calculating angle seen from left and right cameras
             left_angle = steering_angle
@@ -94,17 +86,20 @@ def train_model():
     model = Sequential()
     model.add(Convolution2D(nb_filters, kernel_size[0], kernel_size[1],
                             border_mode='valid',
-                            input_shape=(80, 320, 3)))
+                            input_shape=(80, 220, 3)))
     model.add(MaxPooling2D(pool_size=pool_size))
     model.add(Dropout(0.5))
+    model.add(Activation('tanh'))
 
     model.add(Convolution2D(nb_filters, kernel_size[0], kernel_size[1],
                             border_mode='valid'))
     model.add(MaxPooling2D(pool_size=pool_size))
     model.add(Dropout(0.75))
+    model.add(Activation('tanh'))
 
     model.add(Flatten())
     model.add(Dense(256))
+    model.add(Activation('tanh'))
     model.add(Dense(1))
 
     model.compile(loss='mean_squared_error', optimizer=Adam())
@@ -117,7 +112,7 @@ def train_model():
     checkpoint = ModelCheckpoint(checkpoint_path, verbose=1, save_best_only=False, save_weights_only=False, mode='auto')
 
     model.fit_generator(batch_generator(X_train, Y_train),
-                        samples_per_epoch= len(X_train), nb_epoch = 2,
+                        samples_per_epoch= len(X_train), nb_epoch = 10,
                         verbose=1, validation_data=batch_generator(X_val, Y_val),
                         nb_val_samples=len(X_val), callbacks=[checkpoint], max_q_size=1, pickle_safe=False)
 
