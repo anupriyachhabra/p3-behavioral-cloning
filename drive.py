@@ -10,7 +10,6 @@ from io import BytesIO
 from model import preprocess
 
 from keras.models import model_from_json
-from keras.utils.visualize_util import plot
 
 sio = socketio.Server()
 app = Flask(__name__)
@@ -42,8 +41,8 @@ def telemetry(sid, data):
 
     throttle = 0.2
 
-    #if abs(steering_angle) > 0.2 :
-       # throttle = 0.0
+    if abs(steering_angle) > 0.3 and float(speed) > 5.0:
+        throttle = 0.0
 
 
 
@@ -77,10 +76,8 @@ if __name__ == '__main__':
     model.compile("adam", "mse")
     # got in second epoch for this model
 
-    weights_file = args.model.replace('json', 'h5')
+    weights_file = 'weights.04-0.02.h5' #args.model.replace('json', 'h5')
     model.load_weights(weights_file)
-    
-    plot(model, to_file='model.png', show_shapes= True)
 
     # wrap Flask application with engineio's middleware
     app = socketio.Middleware(sio, app)
