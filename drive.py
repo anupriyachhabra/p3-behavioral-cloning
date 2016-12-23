@@ -12,7 +12,6 @@ from model import preprocess
 from keras.models import model_from_json
 from keras.utils.visualize_util import plot
 
-
 sio = socketio.Server()
 app = Flask(__name__)
 model = None
@@ -41,12 +40,8 @@ def telemetry(sid, data):
     throttle = 0.2
 
     # Slowing down while turning
-    if abs(steering_angle) > 0.3 :
-        throttle = 0.0
-
-    #Added extra bias/weightage to right as data contains too many left turns (biased to left)
-    #if steering_angle > 0 :
-        #steering_angle += 0.15
+    #if abs(steering_angle) > 0.3 :
+       # throttle = 0.0
 
     print(steering_angle, throttle)
     send_control(steering_angle, throttle)
@@ -76,6 +71,8 @@ if __name__ == '__main__':
     json_file.close()
     model = model_from_json(loaded_model_json)
     model.compile("adam", "mse")
+    # got in second epoch for this model
+
     weights_file = args.model.replace('json', 'h5')
     model.load_weights(weights_file)
     
