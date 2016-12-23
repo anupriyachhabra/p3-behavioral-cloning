@@ -5,3 +5,4 @@ IMG
 training*
 .DS_store
 __pycache__
+weights.*

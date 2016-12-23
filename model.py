@@ -89,13 +89,11 @@ def train_model():
                             input_shape=(80, 220, 3)))
     model.add(MaxPooling2D(pool_size=pool_size))
     model.add(Dropout(0.5))
-    model.add(Activation('tanh'))
 
     model.add(Convolution2D(nb_filters, kernel_size[0], kernel_size[1],
                             border_mode='valid'))
     model.add(MaxPooling2D(pool_size=pool_size))
     model.add(Dropout(0.75))
-    model.add(Activation('tanh'))
 
     model.add(Flatten())
     model.add(Dense(256))
