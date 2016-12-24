@@ -28,10 +28,14 @@ def telemetry(sid, data):
     imgString = data["image"]
     image = Image.open(BytesIO(base64.b64decode(imgString)))
     image_array = np.asarray(image)
+
+    # Preprocess image before passing to model for prediction
     height = image_array.shape[0]
     width = image_array.shape[1]
     image_array = image_array[height//2 - 25: height-25, 50: width-50]
     image_array = preprocess(image_array)
+    # Preprocess finished
+
     transformed_image_array = image_array[None, :, :, :]
 
     # This model currently assumes that the features of the model are just the images. Feel free to change this.

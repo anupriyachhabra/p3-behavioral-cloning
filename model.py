@@ -8,7 +8,6 @@ from keras.optimizers import Adam
 from scipy import misc
 from sklearn.model_selection import train_test_split
 from keras.callbacks import ModelCheckpoint
-#from imblearn.over_sampling import SMOTE
 
 def preprocess(images):
 
@@ -22,7 +21,7 @@ def preprocess(images):
     return images
 
 
-def batch_generator(X_train, Y_train, input_shape = (80, 320, 3), batch_size = 50):
+def batch_generator(X_train, Y_train, batch_size = 50):
     train_images = []
     train_steering = []
 
@@ -30,11 +29,15 @@ def batch_generator(X_train, Y_train, input_shape = (80, 320, 3), batch_size = 5
         for i in range(0, len(X_train)):
             img = misc.imread(X_train[i])
 
-            # Crop top half image
             height = img.shape[0]
             width = img.shape[1]
-            #width -50 + 50
+
+            ''''
+            Image has been cropped to remove the unnecessary scenery, so that
+            model can focus on learning the important features from the image
+            '''
             img = img[height // 2 - 25: height - 25, 50: width-50]
+
             train_images.append(img)
             train_steering.append(Y_train[i])
             if (i !=0 and i % batch_size == 0) or i == (len(X_train)-1) :
@@ -55,11 +58,11 @@ def train_model():
             steering_angle = float(row[3])
             y_train.append(steering_angle)
 
-            #left image
+            #left image 0.25 has been added to steering_angle to get angle equivalent to left camera
             X_train.append(row[1].strip())
             y_train.append(steering_angle + 0.25)
 
-            #right image
+            #right image 0.25 has been subtracted from steering_angle to get angle euivalent to right camera
             X_train.append(row[2].strip())
             y_train.append(steering_angle - 0.25)
 
@@ -90,10 +93,11 @@ def train_model():
 
     model.compile(loss='mean_squared_error', optimizer=Adam())
 
-
+    # Split for validation data
     X_train, X_val, Y_train, Y_val = train_test_split(
             X_train, y_train,test_size=0.05, random_state=832289)
 
+    # Created checkpoint for checking model's performance at different epochs
     checkpoint_path = "weights.{epoch:02d}-{val_loss:.2f}.h5"
     checkpoint = ModelCheckpoint(checkpoint_path, verbose=1, save_best_only=False, save_weights_only=False, mode='auto')
 
