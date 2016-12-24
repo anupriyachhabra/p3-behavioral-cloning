@@ -32,7 +32,7 @@ so that if the car sees a scene similar to left camera it can find the appropria
 |Steering Angle = 0.34|Steering Angle = 0.69|Steering Angle = 0.09|
 
 
-* Also I have used a custom generator to feed data to model.fit_generator as the images were not fitting the RAM of my computer
+* Also I have used a custom generator to feed data to model.fit_generator as the images were not fitting the RAM of my computer.
 
 
 
@@ -51,12 +51,13 @@ from left and right of the image so that if the model is supposed to turn right 
    ![Uncropped Image](example_images/turn_right_uncropped.jpg?raw=true)
 
  - In the uncropped image above there are lot of lane markers on right but significant amount in left as well, making the
- model make wrong predictions. In the cropped image the model has more amount of right line markers and significantly less left markers
- so model can make prediction to turn right with more accuracy.
+ model make wrong predictions. In the cropped image the model has more amount of right line markers and significantly less
+ left markers so model can make prediction to turn right with more accuracy.
 
 
 #### Simulation and Driving
 * I have reduced the throttle of car to 0.1 when making turns so that it does not oversteer.
+* Also I have increased throttle to 0.4 if speed goes less than 5.0, this was only needed for track 2
 
 
 
