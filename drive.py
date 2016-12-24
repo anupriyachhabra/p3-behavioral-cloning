@@ -69,7 +69,7 @@ if __name__ == '__main__':
     model.compile("adam", "mse")
     # got in second epoch for this model
 
-    weights_file = 'weights.04-0.02.h5' #args.model.replace('json', 'h5')
+    weights_file = args.model.replace('json', 'h5')
     model.load_weights(weights_file)
 
     # wrap Flask application with engineio's middleware

@@ -28,11 +28,7 @@ def batch_generator(X_train, Y_train, input_shape = (80, 320, 3), batch_size = 5
 
     while True:
         for i in range(0, len(X_train)):
-
-            if X_train[i].startswith('flip'):
-                img = np.fliplr(misc.imread(X_train[i][4:]))
-            else:
-                img = misc.imread(X_train[i])
+            img = misc.imread(X_train[i])
 
             # Crop top half image
             height = img.shape[0]
@@ -59,16 +55,6 @@ def train_model():
             steering_angle = float(row[3])
             y_train.append(steering_angle)
 
-            # Calculating angle seen from left and right cameras
-            left_angle = steering_angle
-            right_angle = steering_angle
-            if steering_angle < 0:
-                left_angle = steering_angle * 0.5
-                right_angle = steering_angle * 1.5
-            if steering_angle > 0:
-                left_angle = steering_angle * 1.5
-                right_angle = steering_angle * 0.5
-
             #left image
             X_train.append(row[1].strip())
             y_train.append(steering_angle + 0.25)
@@ -88,16 +74,18 @@ def train_model():
                             border_mode='valid',
                             input_shape=(80, 220, 3)))
     model.add(MaxPooling2D(pool_size=pool_size))
+    model.add(Activation('elu'))
     model.add(Dropout(0.5))
 
     model.add(Convolution2D(nb_filters, kernel_size[0], kernel_size[1],
                             border_mode='valid'))
     model.add(MaxPooling2D(pool_size=pool_size))
+    model.add(Activation('elu'))
     model.add(Dropout(0.75))
 
     model.add(Flatten())
     model.add(Dense(256))
-    model.add(Activation('tanh'))
+    model.add(Activation('elu'))
     model.add(Dense(1))
 
     model.compile(loss='mean_squared_error', optimizer=Adam())
