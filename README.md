@@ -37,7 +37,7 @@ so that if the car sees a scene similar to left camera it can find the appropria
 
 
 #### PreProcessing and Image Cropping
-* I have normalized images to between tange of -0.5 to 0.5
+* I have normalized images to between range of -0.5 to 0.5
 * When I was using only center images, I cropped top half of the image as it
 does not contain data relavant to track, its just scenery. Size of my image was reduce to 80 x 320
 * After I added left and right images I realised that the car bonnet is an extra parameter that the model has to learn,
