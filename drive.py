@@ -39,6 +39,14 @@ def telemetry(sid, data):
     # The driving model currently just outputs a constant throttle. Feel free to edit this.
     throttle = 0.2
 
+    # Reduced speed while turning for older mac
+    if abs(steering_angle) > 0.1 and float(speed) > 5.0 :
+        throttle = 0.1
+
+    # Increased throttle for tough terrain on track 2
+    if float(speed) < 5.0 :
+        throttle = 0.4
+
     print(steering_angle, throttle)
     send_control(steering_angle, throttle)
 
@@ -67,7 +75,6 @@ if __name__ == '__main__':
     json_file.close()
     model = model_from_json(loaded_model_json)
     model.compile("adam", "mse")
-    # got in second epoch for this model
 
     weights_file = args.model.replace('json', 'h5')
     model.load_weights(weights_file)
