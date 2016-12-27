@@ -13,7 +13,8 @@ and can be masked out.
 and found that students had actually cropped out the images. I liked the idea but did not crop the images yet, instead
 I started writing a rough model with this knowledge.
 * For a model for this project I started with the basic Model I built at the end of Keras lab in Lesson 11 of this course.
-https://github.com/anupriyachhabra/keras-lab/blob/master/traffic-sign-classification-with-keras.ipynb
+https://github.com/anupriyachhabra/keras-lab/blob/master/traffic-sign-classification-with-keras.ipynb.
+The final architecture of model is defined in section [Architecture](#architecture) .
 * I decided to use AdamOptimizer as its is efficient and self tuning.
 * Then I removed the softmax activation as this is a regression problem and softmax is good for classification problem.
 * Also I changed the loss to "mean squared error" as that is the most common type of loss taught in this course
