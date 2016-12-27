@@ -23,6 +23,10 @@ The final architecture of model is defined in section [Architecture](#architectu
 to one-third size. But on further analysis of images I decided to be bold and crop top half of the image.
 * Cropping the top half of the image made my model compile and I was able to test out my first implementation in autonomous
 mode. My actually drove quite well except for sharp turns, where it got stuck.
+* I started with 32 filters of size 3X3 for each conv net. I did increase the number of filters from 32 to 64 to 256 and saw
+improved performance with that. Increasing the number of filters increased the training time a lot but the performance improvement
+was not that great and I had the belief that this is a simple set of images , its only a video game not a real world scenario
+and I should be able to train a model with less number of filters. So I continued with 32 filters.
 * Till this point I was only training my model for 3 epochs, I decided to train it for more epochs- upto 20 and saved the weights
 using callbacks - ModelCheckPoint.
 * I then applied the saved weights in drive.py and ran the model against random epochs starting with weights for 3rd epoch,
@@ -52,8 +56,9 @@ the model learn faster. So I decided to use ELU in final submission.
 
 #### Architecture
 * I have used a neural network consisting of 2 Convolution layer followed by 2 Fully Connected layers.
+* Both the conv nets consists of 32 filters of size 3X3 and stride 1 with valid padding.
 * I have used ELU activation after each layer except for the last layer. I have used ELU activation as it helps the model learn faster.
-* I have also added MaxPooling after each Convolution layer to reduce number of features and only have the model learn the most important features.
+* I have also added 4X4 MaxPooling after each Convolution layer to reduce number of features and only have the model learn the most important features.
 * I have added dropout 0.5 after 1st Conv layer and 0.75 after 2nd Conv layer to reduce overfitting.
 
 * Following is a detailed visualization of the model
