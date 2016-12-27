@@ -31,7 +31,10 @@ using callbacks - ModelCheckPoint.
 different and I should try to improve my model.
 * I studied the images again and decided to add the left and right images with an adjustment to steering angle to compensate
 for the side cameras. A visualization of camera angles is given in section [Training](#training).
-* After adding the left and right images my model started making turns neatly but at the last right turn it was detecting
+*  After adding the left and right images my model started failing at model.fit method due to three times the number of images.
+At that point I went ahead and wrote a custom batch_generator so that I can use model.fit_generator to compile the model in
+batches. At this point the the model started compiling.
+* The compiled model started making turns neatly but at the last right turn it was detecting
 right turn as straight in few areas. So I removed further scenery from right and left of image to make the model more sure
 of what it is supposed to be doing. A detailed explanation of this approach is given in section [PreProcessing and Image Cropping](#preprocessing-and-image-cropping)
 * At this point my model started making all correct predictions but the angles were not big enough for turns. So it was
