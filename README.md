@@ -17,7 +17,7 @@ https://github.com/anupriyachhabra/keras-lab/blob/master/traffic-sign-classifica
 * I decided to use AdamOptimizer as its is efficient and self tuning.
 * Then I removed the softmax activation as this is a regression problem and softmax is good for classification problem.
 * Also I changed the loss to "mean squared error" as that is the most common type of loss taught in this course
- and also recommended by fcollet here https://github.com/fchollet/keras/issues/108
+ and also recommended by Francois Chollet for regression problems here https://github.com/fchollet/keras/issues/108
 * When calling the model.fit method with all the images my program started crashing, so I thought to actually crop the images
 to one-third size. But on further analysis of images I decided to be bold and crop top half of the image.
 * Cropping the top half of the image made my model compile and I was able to test out my first implementation in autonomous
@@ -26,7 +26,7 @@ mode. My actually drove quite well except for sharp turns, where it got stuck.
 using callbacks - ModelCheckPoint.
 * I then applied the saved weights in drive.py and ran the model against random epochs starting with weights for 3rd epoch,
 5th epoch etc. I saw no improvement after 10th epoch so I settled on 10 for number of epochs.
-* At this point my car was stil failing to make sharp turns but driving smoother.
+* At this point my car was still failing to make sharp turns but driving smoother.
 * I explored using transfer learning using VGG or AlexNet, but I thought that the dataset used in these models is very
 different and I should try to improve my model.
 * I studied the images again and decided to add the left and right images with an adjustment to steering angle to compensate
@@ -41,7 +41,7 @@ of what it is supposed to be doing. A detailed explanation of this approach is g
 turning left and right where it was supposed to but the predicted steering angle was falling a bit short, and my car was
 touching lane lines.
 * Till this point I had not added any activations to my model and decided to add "tanh" activation to my model as this activation
-produces stronger gradients. I equated that too stronger angles if the input is large and smoother angles if input is small.
+produces stronger gradients. I equated that to stronger angles if the input is large and smoother angles if input is small.
 I referred this article https://theclevermachine.wordpress.com/tag/tanh-function/
 * After adding the tanh activation my model started making stronger turns as desired, but the mse got higher than before.
 That is when I looked at ELU activation and found that it has many properties similar to tanh but is better than tanh since it helps
