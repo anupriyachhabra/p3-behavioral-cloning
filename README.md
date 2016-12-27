@@ -5,6 +5,47 @@ training mode and then tested on Autonomous mode in both track 1 and track 2 to 
 and generalizes the learning for track2.
 
 
+#### Approach taken to derive the Architecture for this Project
+* First of all I analyzed the driving_log.csv file and studied the images captured in training mode.
+* Just like the very first project of this course I realized that lot of data in the images is scenery
+and can be masked out.
+* Initially I masked the images by making top one-third portion black. I read some discussions on Udacity forums
+and found that students had actually cropped out the images. I liked the idea but did not crop the images yet, instead
+I started writing a rough model with this knowledge.
+* For a model for this project I started with the basic Model I built at the end of Keras lab in Lesson 11 of this course.
+https://github.com/anupriyachhabra/keras-lab/blob/master/traffic-sign-classification-with-keras.ipynb
+* I decided to use AdamOptimizer as its is efficient and self tuning.
+* Then I removed the softmax activation as this is a regression problem and softmax is good for classification problem.
+* Also I changed the loss to "mean squared error" as that is the most common type of loss taught in this course
+ and also recommended by fcollet here https://github.com/fchollet/keras/issues/108
+* When calling the model.fit method with all the images my program started crashing, so I thought to actually crop the images
+to one-third size. But on further analysis of images I decided to be bold and crop top half of the image.
+* Cropping the top half of the image made my model compile and I was able to test out my first implementation in autonomous
+mode. My actually drove quite well except for sharp turns, where it got stuck.
+* Till this point I was only training my model for 3 epochs, I decided to train it for more epochs- upto 20 and saved the weights
+using callbacks - ModelCheckPoint.
+* I then applied the saved weights in drive.py and ran the model against random epochs starting with weights for 3rd epoch,
+5th epoch etc. I saw no improvement after 10th epoch so I settled on 10 for number of epochs.
+* At this point my car was stil failing to make sharp turns but driving smoother.
+* I explored using transfer learning using VGG or AlexNet, but I thought that the dataset used in these models is very
+different and I should try to improve my model.
+* I studied the images again and decided to add the left and right images with an adjustment to steering angle to compensate
+for the side cameras. A visualization of camera angles is given in section [Training](#training).
+* After adding the left and right images my model started making turns neatly but at the last right turn it was detecting
+right turn as straight in few areas. So I removed further scenery from right and left of image to make the model more sure
+of what it is supposed to be doing. A detailed explanation of this approach is given in section [PreProcessing and Image Cropping](#preprocessing-and-image-cropping)
+* At this point my model started making all correct predictions but the angles were not big enough for turns. So it was
+turning left and right where it was supposed to but the predicted steering angle was falling a bit short, and my car was
+touching lane lines.
+* Till this point I had not added any activations to my model and decided to add "tanh" activation to my model as this activation
+produces stronger gradients. I equated that too stronger angles if the input is large and smoother angles if input is small.
+I referred this article https://theclevermachine.wordpress.com/tag/tanh-function/
+* After adding the tanh activation my model started making stronger turns as desired, but the mse got higher than before.
+That is when I looked at ELU activation and found that it has many properties similar to tanh but is better than tanh since it helps
+the model learn faster. So I decided to use ELU in final submission.
+
+
+
 #### Architecture
 * I have used a neural network consisting of 2 Convolution layer followed by 2 Fully Connected layers.
 * I have used ELU activation after each layer except for the last layer. I have used ELU activation as it helps the model learn faster.
