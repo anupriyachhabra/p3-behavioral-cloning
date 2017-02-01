@@ -124,3 +124,7 @@ pip install
 if graphviz gives errors - brew install graphviz
 https://github.com/fchollet/keras/issues/3210
 
+
+#### Reviewer's comments
+I have included the comments I got for this project from Udacity's reviewer [here](./ProjectReview.pdf)
+
